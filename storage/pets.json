@@ -1,0 +1,26 @@
+[
+    {
+      "id":1,
+      "species":"dog",
+      "breed":"Golden Retriver",
+      "age":3
+    },
+    {
+      "id":2,
+      "species":"dog",
+      "breed":"Standard Poodle",
+      "age":7
+    },
+    {
+      "id":3,
+      "species":"cat",
+      "breed":"Siamese",
+      "age":9
+    },
+    {
+      "id":4,
+      "species":"ferret",
+      "breed":"Sable",
+      "age":1
+    }
+]

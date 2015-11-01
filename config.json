@@ -1,0 +1,8 @@
+{
+  "pets":{
+    "id":"FILTER_SANITIZE_NUMBER_INT",
+    "species":"FILTER_SANITIZE_STRING",
+    "breed":"FILTER_SANITIZE_STRING",
+    "age":"FILTER_SANITIZE_NUMBER_INT"
+  }
+}
