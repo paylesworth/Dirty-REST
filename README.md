@@ -45,7 +45,7 @@ Also, the `storage` directory, and any preexisting file in it, must be writable 
 | Update  |    PUT        |    --             |    update item *      |
 | Delete  |    DELETE     |    --             |    delete item        |
 
- 									* not implemented
+ PUT is not implemented yet
  
 ##  Return Status Codes
  
