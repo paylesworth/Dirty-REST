@@ -3,7 +3,8 @@
  * Dirty REST
  *
  * A dirt simple REST API framework.
- * Phil Aylesworth 2015-10-29
+ * Phil Aylesworth
+ * Version 1.1 2015-11-04 - Implement PUT
  *
  * WARNING: This software uses file storage and has no authentication.
  * Do not use this software for a real API. It is for testing and 
@@ -225,7 +226,7 @@ function POST($api_noun) {
 }
 
 /************
- * GET all items or just one
+ * GET collection or just one item
  **/
 function GET($api_noun) {
 	global $id;
@@ -247,8 +248,37 @@ function GET($api_noun) {
 /************
  * PUT - update an item
  **/
-// Coming soon ...
+function PUT($api_noun) {
+	global $id, $storage;
+	if($id === NULL) {
+		throw new Exception("PUT - must specify `id`", 404);
+	}
+	$edit = GET($api_noun);
+	$no_content = TRUE;
+	
+	$api = $GLOBALS['api']->{$api_noun};
+	parse_str(file_get_contents("php://input"),$put_vars);
+	foreach($api as $key => $data_type) {
+		if(isset($put_vars[$key]) and $key != 'id') {
+			$edit->{$key} = filter_var(trim($put_vars[$key]), constant($data_type));
+			$no_content = FALSE;
+		}
+	}
 
+    // No updates where provided
+	if($no_content) {
+		http_response_code(204); // No Content
+		return $edit;
+	}
+
+    // Save update to datafile
+	$data = get_api_data($api_noun);
+	$index = get_index($data, $id);
+	$data[$index] = $edit;
+	file_put_contents("${storage}${api_noun}.json", json_encode($data));
+	
+	return $edit;
+}
 
 /************
  * DELETE an item
@@ -264,9 +294,9 @@ function DELETE($api_noun) {
 			file_put_contents("${storage}${api_noun}.json", json_encode($data));
 			return "";
 		} else {
-			throw new Exception('Selected item does not exist. (266)', 404);
+			throw new Exception('Selected item does not exist.', 404);
 		}
 	}
-	throw new Exception('DELETE method must specify which item to delete. (269)', 404);
+	throw new Exception('DELETE method must specify which item to delete.', 404);
 }
 
