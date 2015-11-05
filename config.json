@@ -1,4 +1,8 @@
 {
+  "dirtyRest":{
+    "apiBase":"/api/",
+    "storage":"storage/"
+  },
   "pets":{
     "id":"FILTER_SANITIZE_NUMBER_INT",
     "species":"FILTER_SANITIZE_STRING",

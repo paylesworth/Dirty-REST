@@ -4,7 +4,7 @@
  *
  * A dirt simple REST API framework.
  * Phil Aylesworth
- * Version 1.1 2015-11-04 - Implement PUT
+ * Version 1.1.1 2015-11-05
  *
  * WARNING: This software uses file storage and has no authentication.
  * Do not use this software for a real API. It is for testing and 
@@ -12,16 +12,19 @@
  *
  **/
 
-/******************** Start Config ********************/
-// set the location of your API
-$api_base = '/web595/api/';
+// Turn off all error reporting
+error_reporting(0);
 
-// where to store the data. This directory must be writable by the webserver.
-// if it is relative, it is relative to this file.
-$storage = 'storage/';
-
+/******************** Config ********************/
+// All configuration is now done in config.json.
 // Check out the README.md to configure the API in config.json.
-/******************** End Config ********************/
+
+// get API config info
+$api = json_decode(file_get_contents("config.json"));
+// Get settings from config file
+$api_base = isset($api->dirtyRest->apiBase) ? $api->dirtyRest->apiBase : '/api/';
+$storage  = isset($api->dirtyRest->storage) ? $api->dirtyRest->storage : 'storage/';
+
 
 // set the output format from the Accept: header
 // (should also look at filename extension)
@@ -94,7 +97,11 @@ if (!function_exists('http_response_code')) {
 
 set_exception_handler(function ($e) use ($format) {
 	http_response_code($e->getCode());
-	send_output($e->getMessage(), $format);
+	$error = new stdClass();
+	$error->code = $e->getCode();
+	$error->message = $e->getMessage();
+	//$error->api = $api;
+	send_output($error, $format);
 });
 
 // separate parts of url that we need making sure everything is okay
@@ -104,10 +111,10 @@ $pieces = explode("/", str_replace($api_base,'',$_SERVER['REQUEST_URI']));
 if(isset($pieces[0])) {
 	$api_noun = filter_var($pieces[0], FILTER_SANITIZE_STRING);
 	if($api_noun === '') {
-		throw new Exception("404, Not Found (105)", 404);
+		throw new Exception("No collection specified.", 404);
 	}
 } else {
-	throw new Exception("404, Not Found (108)", 404);
+	throw new Exception("Collection not found on server.)", 404);
 }
 if(isset($pieces[1])) {
 	$id = filter_var($pieces[1], FILTER_SANITIZE_NUMBER_INT);
@@ -115,9 +122,6 @@ if(isset($pieces[1])) {
 		throw new Exception("404, Not Found (113)", 404);  // bad id provided
 	}
 }
-
-// get API config info
-$api = json_decode(file_get_contents("config.json"));
 
 // HTTP verb
 $http_method = $_SERVER['REQUEST_METHOD'];
@@ -153,7 +157,12 @@ function send_output($data, $format) {
  **/
 function get_api_data($api_noun){
 	global $storage;
-	return json_decode(file_get_contents("${storage}${api_noun}.json"));
+	$data = json_decode(file_get_contents("${storage}${api_noun}.json"));
+	if(isset($data)){
+		return $data;
+	} else {
+		throw new Exception("Data file for the collection $api_noun not found.", 404);
+	}
 }
  
 /**
