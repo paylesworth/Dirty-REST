@@ -1,4 +1,7 @@
 RewriteEngine on
+# if you have a UserDir account (path starts with ~) then add this line 
+# and set to the same path as the apiBase in config.json
+#RewriteBase /~johndoe/somedir/api/
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule . index.php [L]
