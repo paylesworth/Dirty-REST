@@ -45,6 +45,23 @@ In order for the routing to work, any request for a file that does not exist mus
 
 Also, the `storage` directory, and any preexisting file in it, must be writable by the web server.
 
+Most Apache configurations won't allow PUT requests, so they need to be enabled in the `.htaccess` file.
+
+	<Limit GET POST PUT DELETE HEAD OPTIONS>
+	    Order allow,deny
+	    Allow from all
+	</Limit>
+	<LimitExcept GET POST PUT DELETE HEAD OPTIONS>
+	    Order deny,allow
+	    Deny from all
+	</LimitExcept>
+
+Any kind of URL rewriting might mess things up. For example, UserDir will need an extra directive right after the `RewriteEngine on` line:
+
+	RewriteBase /~johndoe/somedir/api/
+
+Here, the path will match the path assigned to `apiBase` in the `config.json` file.
+
 ## CRUD Actions
  
 | CRUD    |    HTTP Verb  |    /items         |    /items/:id         |
