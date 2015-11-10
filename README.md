@@ -17,18 +17,18 @@ For the collections, the key is the property name and the value is the PHP [sani
 
 For example:
 
-  {
-    "dirtyRest":{
-    "apiBase":"/web595/api/",
-    "storage":"storage/"
-    },
-    "pets":{
-      "id":"FILTER_SANITIZE_NUMBER_INT",
-      "species":"FILTER_SANITIZE_STRING",
-      "breed":"FILTER_SANITIZE_STRING",
-      "age":"FILTER_SANITIZE_NUMBER_INT"
-    }
-  }
+	{
+		"dirtyRest":{
+			"apiBase":"/web595/api/",
+			"storage":"storage/"
+		},
+		"pets":{
+			"id":"FILTER_SANITIZE_NUMBER_INT",
+			"species":"FILTER_SANITIZE_STRING",
+			"breed":"FILTER_SANITIZE_STRING",
+			"age":"FILTER_SANITIZE_NUMBER_INT"
+		}
+	}
 
 ## The `id` Property
 
