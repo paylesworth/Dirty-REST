@@ -4,7 +4,7 @@
  *
  * A dirt simple REST API framework.
  * Phil Aylesworth
- * Version 1.1.2 2015-11-12
+ * Version 1.1.3 2015-11-12
  *
  * WARNING: This software uses file storage and has no authentication.
  * Do not use this software for a real API. It is for testing and 
@@ -128,7 +128,6 @@ if(isset($pieces[1])) {
 $http_method = $_SERVER['REQUEST_METHOD'];
 
 
-
 /************************ Routing ************************/
 if(function_exists($http_method)) {
 	$data = $http_method($api_noun);
@@ -140,7 +139,27 @@ send_output($data, $format);
 
 
 /************************ Utility functions ************************/
-
+/**
+ * decode the uploaded data. It will either be application/x-www-form-urlencoded data or application/json
+ **/
+ function get_upload($api){
+	 global $http_method;
+	$new = array();
+	 if((isset($_SERVER['CONTENT_TYPE'])) && false !== strpos($_SERVER['CONTENT_TYPE'], "json")) {
+	 	// JSON
+		$data = json_decode(file_get_contents('php://input'), TRUE);
+	 } else {
+	 	// Form URL Encoded
+		parse_str(file_get_contents("php://input"),$data);
+	 }
+	 
+	foreach($api as $key => $data_type) {
+		if(isset($data[$key]) and $key != 'id') {
+			$new[$key] = filter_var(trim($data[$key]), constant($data_type));
+		}
+	}
+	return $new;
+ }
 
 /**
  * Write the data to the file
@@ -233,14 +252,8 @@ function POST($api_noun) {
 	$id++;
 	
 	// create a new item for any POST params that match the API
-	$new = array();
+	$new = get_upload($api);
 	$new['id'] = $id;
-	foreach($api as $key => $data_type) {
-		if(isset($_POST[$key]) and $key != 'id') {
-			$new[$key] = filter_var(trim($_POST[$key]), constant($data_type));
-		}
-	}
-	
 	$data[] = $new;
 
 	save_file($data);
@@ -280,7 +293,8 @@ function PUT($api_noun) {
 	$no_content = TRUE;
 	
 	$api = $GLOBALS['api']->{$api_noun};
-	parse_str(file_get_contents("php://input"),$put_vars);
+	$put_vars = get_upload($api);
+
 	foreach($api as $key => $data_type) {
 		if(isset($put_vars[$key]) and $key != 'id') {
 			$edit->{$key} = filter_var(trim($put_vars[$key]), constant($data_type));

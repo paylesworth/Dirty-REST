@@ -3,7 +3,7 @@
 A dirt simple REST API framework.
 
 Phil Aylesworth
-Version 1.1.2
+Version 1.1.3
 
 WARNING: This software uses file storage and has no authentication. Do not use this software for a real API. It is for testing and educational purposes only. *Really*.
 
@@ -113,3 +113,4 @@ Here, the path will match the path assigned to `apiBase` in the `config.json` fi
  - 1.1   2015-11-04  Implement PUT to update items
  - 1.1.1 2015-11-05  Moved PHP config variables to `config.json`
  - 1.1.2 2015-11-12  Fixed POST error. Check to make sure that a collection is configured. Add error message if it can't write to the storage file.
+ - 1.1.3 2015-11-12  Added ability to accept JSON data as well as Form data for POST and PUT
