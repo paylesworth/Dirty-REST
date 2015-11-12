@@ -112,3 +112,4 @@ Here, the path will match the path assigned to `apiBase` in the `config.json` fi
  - 1.0.1 2015-11-03  Added a polyfil function for http_response_code to support PHP < 5.4
  - 1.1   2015-11-04  Implement PUT to update items
  - 1.1.1 2015-11-05  Moved PHP config variables to `config.json`
+ - 1.1.2 2015-11-12  Check to make sure that a collection is configured

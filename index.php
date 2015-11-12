@@ -4,7 +4,7 @@
  *
  * A dirt simple REST API framework.
  * Phil Aylesworth
- * Version 1.1.1 2015-11-05
+ * Version 1.1.2 2015-11-12
  *
  * WARNING: This software uses file storage and has no authentication.
  * Do not use this software for a real API. It is for testing and 
@@ -108,18 +108,19 @@ set_exception_handler(function ($e) use ($format) {
 $api_noun = NULL;
 $id = NULL;
 $pieces = explode("/", str_replace($api_base,'',$_SERVER['REQUEST_URI']));
-if(isset($pieces[0])) {
+
+if($pieces[0] != '') {
 	$api_noun = filter_var($pieces[0], FILTER_SANITIZE_STRING);
-	if($api_noun === '') {
-		throw new Exception("No collection specified.", 404);
-	}
 } else {
-	throw new Exception("Collection not found on server.)", 404);
+	throw new Exception("No collection specified.", 404);
+}
+if(!property_exists($api, $api_noun)){
+	throw new Exception("Collection $api_noun does not exist.", 404);
 }
 if(isset($pieces[1])) {
 	$id = filter_var($pieces[1], FILTER_SANITIZE_NUMBER_INT);
 	if($id < 1) {
-		throw new Exception("404, Not Found (113)", 404);  // bad id provided
+		throw new Exception("Value of id is out of range. Must be greater than zero.", 404);  // bad id provided
 	}
 }
 
@@ -139,9 +140,22 @@ send_output($data, $format);
 
 
 /************************ Utility functions ************************/
+
+
 /**
- * Very primitive html/json output handler
+ * Write the data to the file
  **/
+ function save_file($data){
+	 global $storage, $api_noun;
+	 $status = file_put_contents("${storage}${api_noun}.json", json_encode($data));
+	 if($status === FALSE){
+		 throw new Exception("Error writing to file ${storage}${api_noun}.json.", 500);
+	 }
+ }
+
+	 /**
+	  * Very primitive html/json output handler
+	  **/
 function send_output($data, $format) {
 	if($format == "html") {
 		header("Content-Type: text/plain");
@@ -204,9 +218,9 @@ function POST($api_noun) {
 	if($id > 0) {
 		$index = get_index($data, $id);
 		if($index !== NULL) {
-			throw new Exception("409 (Conflict) item already exists (196)", 409);
+			throw new Exception("Conflict, item already exists.", 409);
 		} else {
-			throw new Exception("Not Found (198)", 404);
+			throw new Exception("Can not specify id with POST.", 404);
 		}
 	}
 	
@@ -229,7 +243,7 @@ function POST($api_noun) {
 	
 	$data[] = $new;
 
-	file_put_contents("${storage}${api_noun}.json", json_encode($data));
+	save_file($data);
 	http_response_code(201); // Created
 	return $new;
 }
@@ -284,7 +298,7 @@ function PUT($api_noun) {
 	$data = get_api_data($api_noun);
 	$index = get_index($data, $id);
 	$data[$index] = $edit;
-	file_put_contents("${storage}${api_noun}.json", json_encode($data));
+	save_file($data);
 	
 	return $edit;
 }
@@ -300,7 +314,7 @@ function DELETE($api_noun) {
 		$index = get_index($data, $id);
 		if($index !== NULL) {
 			array_splice($data, $index, 1);
-			file_put_contents("${storage}${api_noun}.json", json_encode($data));
+			save_file($data);
 			return "";
 		} else {
 			throw new Exception('Selected item does not exist.', 404);
@@ -308,4 +322,3 @@ function DELETE($api_noun) {
 	}
 	throw new Exception('DELETE method must specify which item to delete.', 404);
 }
-
