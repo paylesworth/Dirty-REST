@@ -13,7 +13,7 @@ The `config.json` file is used to describe the API and for configuration setting
 
 For the configuration, `dirtyRest->apiBase` is the URL path to the `index.php` file and `dirtyRest->storage` is the relative path to the directory that contains the API data files.
 
-For the collections, the key is the property name and the value is the PHP [sanitize filter](http://php.net/manual/en/filter.filters.sanitize.php) used for the data type. The `id` property is not required and will be ignored.
+For the collections, the key is the property name and the value is the PHP [validate](http://php.net/manual/en/filter.filters.validate.php) and [sanitize](http://php.net/manual/en/filter.filters.sanitize.php) filters used for the data type. The `id` property is not required and will be ignored. Be sure to use validate filters for non-string types to achive the type conversion.
 
 For example:
 
@@ -23,10 +23,10 @@ For example:
 			"storage":"storage/"
 		},
 		"pets":{
-			"id":"FILTER_SANITIZE_NUMBER_INT",
+			"id":"FILTER_VALIDATE_INT",
 			"species":"FILTER_SANITIZE_STRING",
 			"breed":"FILTER_SANITIZE_STRING",
-			"age":"FILTER_SANITIZE_NUMBER_INT"
+			"age":"FILTER_VALIDATE_INT"
 		}
 	}
 
