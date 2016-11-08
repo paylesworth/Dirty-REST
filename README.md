@@ -104,7 +104,8 @@ Here, the path will match the path assigned to `apiBase` in the `config.json` fi
 
 ## To Do
 
- - check filename extension for data type (html/json). Right now, filename extensions are not supported.
+ - check filename extension for data type (.html or .json). Right now, filename extensions are not supported.
+ - change config to data type rather than PHP filter
  
 ## Version History
 
